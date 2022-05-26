@@ -11,7 +11,7 @@ import java.lang.Exception
 class AddTaskViewModel : BaseViewModel() {
     private val taskManager = TaskManager.Instance
 
-    fun addTask(name: String, note: String, due: Instant) {
+    fun addTask(name: String, note: String, due: Instant, onSuccess: () -> Unit) {
         safelyLaunch {
             val now = Clock.System.now()
             val errorMessage = when {
@@ -31,6 +31,7 @@ class AddTaskViewModel : BaseViewModel() {
                         dueDate = due,
                     )
                 )
+                onSuccess()
             }
         }
     }

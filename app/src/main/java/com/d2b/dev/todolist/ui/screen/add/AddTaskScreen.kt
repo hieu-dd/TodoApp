@@ -17,6 +17,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.d2b.dev.todolist.utils.DateTime
 import com.d2b.dev.todolist.utils.showDatePicker
+import com.d2b.dev.todolist.utils.showToast
+import kotlinx.coroutines.flow.collect
 import kotlinx.datetime.Clock
 
 @Composable
@@ -26,10 +28,53 @@ fun AddTaskScreenView(
 ) {
     val context = LocalContext.current
 
+    var showError by remember {
+        mutableStateOf<Exception?>(null)
+    }
+
+    LaunchedEffect(key1 = viewModel.error) {
+        viewModel.error.collect {
+            showError = it
+        }
+    }
+    AddTaskContent(
+        handleEvent = { event ->
+            when (event) {
+                is AddTaskEvent.Back -> navController.navigateUp()
+                is AddTaskEvent.AddTask -> {
+                    viewModel.addTask(event.name, event.note, event.dueDate) {
+                        context.showToast("Add task success")
+                        navController.navigateUp()
+                    }
+                }
+                is AddTaskEvent.ShowDatePicker -> {
+                    context.showDatePicker(event.dueDate) { event.onSelect(it) }
+                }
+            }
+        },
+    )
+
+    showError?.let {
+        AlertDialog(
+            onDismissRequest = { showError = null },
+            title = { Text("Error") },
+            text = { Text(it.message.orEmpty()) },
+            buttons = {
+                TextButton(onClick = { showError = null }) {
+                    Text("OK")
+                }
+            },
+        )
+    }
+}
+
+@Composable
+fun AddTaskContent(
+    handleEvent: (AddTaskEvent) -> Unit,
+) {
     val dateInteractionSource = remember {
         MutableInteractionSource()
     }
-    val error by viewModel.error.collectAsState(null)
 
     var taskName by remember {
         mutableStateOf("")
@@ -41,8 +86,10 @@ fun AddTaskScreenView(
         mutableStateOf(Clock.System.now())
     }
 
+
+
     if (dateInteractionSource.collectIsPressedAsState().value) {
-        context.showDatePicker(dueDate) { dueDate = it }
+        handleEvent(AddTaskEvent.ShowDatePicker(dueDate) { dueDate = it })
     }
 
     Scaffold(
@@ -53,7 +100,7 @@ fun AddTaskScreenView(
                     Text("New Tasks", style = MaterialTheme.typography.h6)
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = { handleEvent(AddTaskEvent.Back) }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)
                     }
                 }
@@ -62,7 +109,7 @@ fun AddTaskScreenView(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    viewModel.addTask(name = taskName, note = note, due = dueDate)
+                    handleEvent(AddTaskEvent.AddTask(taskName, note, dueDate))
                 },
                 backgroundColor = Color.White,
             ) {
@@ -116,14 +163,7 @@ fun AddTaskScreenView(
                 interactionSource = dateInteractionSource
             )
         }
-        error?.let {
-            AlertDialog(
-                onDismissRequest = { viewModel.clearError() },
-                title = { Text("Error") },
-                text = { Text(it.message.orEmpty()) },
-                buttons = {},
-            )
-        }
+
     }
 }
 

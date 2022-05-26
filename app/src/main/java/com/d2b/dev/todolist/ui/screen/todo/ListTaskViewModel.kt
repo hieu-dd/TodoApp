@@ -12,7 +12,7 @@ class ListTaskViewModel : ViewModel() {
 
     fun getTasksFlow(): StateFlow<List<Task>> = taskManager.tasks
 
-    fun updateTask(id:String){
+    fun toggleStatusTask(id: String, isComplete: Boolean) {
         viewModelScope.launch {
             taskManager.updateTask(id)
         }
