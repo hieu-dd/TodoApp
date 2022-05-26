@@ -17,7 +17,8 @@ import androidx.navigation.compose.rememberNavController
 import com.d2b.dev.todolist.R
 import com.d2b.dev.todolist.ui.screen.navitem.BottomNavItem
 import com.d2b.dev.todolist.ui.screen.navitem.MainNavigationItem
-import com.d2b.dev.todolist.ui.screen.todo.TodoScreenView
+import com.d2b.dev.todolist.ui.screen.todo.ListTaskScreenView
+import com.d2b.dev.todolist.ui.screen.todo.TypeScreen
 
 @Composable
 fun HomeScreenView(mainNavController: NavController) {
@@ -25,10 +26,12 @@ fun HomeScreenView(mainNavController: NavController) {
     Scaffold(
         bottomBar = { BottomNavigation(navController = navController) },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                mainNavController.navigate(MainNavigationItem.Add.route)
-            }) {
-                Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+            FloatingActionButton(
+                backgroundColor = Color.White,
+                onClick = {
+                    mainNavController.navigate(MainNavigationItem.Add.route)
+                }) {
+                Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colors.primary)
             }
         }
     ) {
@@ -44,7 +47,7 @@ fun BottomNavigation(navController: NavController) {
         BottomNavItem.Incomplete,
     )
     BottomNavigation(
-        backgroundColor = colorResource(id = R.color.teal_200),
+        backgroundColor = Color.White,
         contentColor = Color.Black
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -58,7 +61,7 @@ fun BottomNavigation(navController: NavController) {
                         fontSize = 9.sp
                     )
                 },
-                selectedContentColor = Color.Black,
+                selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = Color.Black.copy(0.4f),
                 alwaysShowLabel = true,
                 selected = currentRoute == item.screen_route,
@@ -82,13 +85,13 @@ fun BottomNavigation(navController: NavController) {
 fun NavigationGraph(navController: NavHostController) {
     NavHost(navController, startDestination = BottomNavItem.Home.screen_route) {
         composable(BottomNavItem.Home.screen_route) {
-            TodoScreenView(text = "Home")
+            ListTaskScreenView(typeScreen = TypeScreen.All)
         }
         composable(BottomNavItem.Complete.screen_route) {
-            TodoScreenView(text = "Done")
+            ListTaskScreenView(typeScreen = TypeScreen.Complete)
         }
         composable(BottomNavItem.Incomplete.screen_route) {
-            TodoScreenView(text = "Done")
+            ListTaskScreenView(typeScreen = TypeScreen.Incomplete)
         }
     }
 }

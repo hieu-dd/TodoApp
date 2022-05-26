@@ -1,16 +1,20 @@
 package com.d2b.dev.todolist.service
 
-import com.d2b.dev.todolist.data.Task
+import com.d2b.dev.todolist.data.model.Task
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class TaskManager : CoroutineScope {
+
+    companion object {
+        val Instance: TaskManager by lazy { TaskManager() }
+    }
+
     override val coroutineContext: CoroutineContext
         get() = job
 
@@ -19,11 +23,30 @@ class TaskManager : CoroutineScope {
     private val _tasks = MutableStateFlow<MutableList<Task>>(mutableListOf())
     val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()
 
-    fun addNewTask(task: Task) {
-        launch {
-            _tasks.emit(_tasks.value.apply {
-                add(task)
-            })
+    suspend fun addNewTask(task: Task) {
+        _tasks.emit(_tasks.value.apply {
+            add(task)
+        })
+    }
+
+    suspend fun updateTask(taskId: String) {
+        val newTasks = copyAndUpdateTasks(_tasks.value, taskId) {
+            it.apply {
+                status =
+                    if (it.status == Task.TaskStatus.Complete) Task.TaskStatus.Incomplete else Task.TaskStatus.Complete
+            }
         }
+        _tasks.emit(newTasks.toMutableList())
+    }
+
+    private fun copyAndUpdateTasks(tasks: List<Task>, taskId: String, block: (Task) -> Task): List<Task> {
+        val result = tasks.map {
+            if (it.id == taskId) {
+                block(it.copy())
+            } else {
+                it.copy()
+            }
+        }
+        return result
     }
 }
