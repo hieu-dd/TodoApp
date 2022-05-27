@@ -14,9 +14,10 @@ import com.d2b.dev.todolist.ui.screen.add.AddTaskScreenView
 import com.d2b.dev.todolist.ui.screen.home.HomeScreenView
 import com.d2b.dev.todolist.ui.screen.navitem.MainNavigationItem
 import com.d2b.dev.todolist.ui.theme.TodoListTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel = MainViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

@@ -43,8 +43,8 @@ fun HomeScreenView(mainNavController: NavController) {
 fun BottomNavigation(navController: NavController) {
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.Complete,
         BottomNavItem.Incomplete,
+        BottomNavItem.Complete,
     )
     BottomNavigation(
         backgroundColor = Color.White,
@@ -87,11 +87,11 @@ fun NavigationGraph(navController: NavHostController) {
         composable(BottomNavItem.Home.screen_route) {
             ListTaskScreenView(typeScreen = TypeScreen.All)
         }
-        composable(BottomNavItem.Complete.screen_route) {
-            ListTaskScreenView(typeScreen = TypeScreen.Complete)
-        }
         composable(BottomNavItem.Incomplete.screen_route) {
             ListTaskScreenView(typeScreen = TypeScreen.Incomplete)
+        }
+        composable(BottomNavItem.Complete.screen_route) {
+            ListTaskScreenView(typeScreen = TypeScreen.Complete)
         }
     }
 }

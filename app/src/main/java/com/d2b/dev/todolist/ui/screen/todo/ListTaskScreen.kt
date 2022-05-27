@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.d2b.dev.todolist.R
 import com.d2b.dev.todolist.data.model.Task
 import com.d2b.dev.todolist.utils.formatDate
@@ -25,7 +26,7 @@ import kotlinx.datetime.Instant
 @Composable
 fun ListTaskScreenView(
     typeScreen: TypeScreen = TypeScreen.All,
-    viewModel: ListTaskViewModel = ListTaskViewModel(),
+    viewModel: ListTaskViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
 

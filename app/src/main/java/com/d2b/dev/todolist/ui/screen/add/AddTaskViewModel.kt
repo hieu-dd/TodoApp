@@ -1,16 +1,19 @@
 package com.d2b.dev.todolist.ui.screen.add
 
-import androidx.lifecycle.viewModelScope
 import com.d2b.dev.todolist.data.model.Task
 import com.d2b.dev.todolist.service.TaskManager
 import com.d2b.dev.todolist.ui.BaseViewModel
 import com.d2b.dev.todolist.utils.isOutDate
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.lang.Exception
+import javax.inject.Inject
 
-class AddTaskViewModel : BaseViewModel() {
-    private val taskManager = TaskManager.Instance
+@HiltViewModel
+class AddTaskViewModel @Inject constructor(
+    private val taskManager: TaskManager,
+) : BaseViewModel() {
 
     fun addTask(name: String, note: String, due: Instant, onSuccess: () -> Unit) {
         safelyLaunch {

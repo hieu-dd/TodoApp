@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.d2b.dev.todolist.utils.formatDate
@@ -24,7 +25,7 @@ import kotlinx.datetime.Clock
 @Composable
 fun AddTaskScreenView(
     navController: NavController,
-    viewModel: AddTaskViewModel = AddTaskViewModel()
+    viewModel: AddTaskViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 
