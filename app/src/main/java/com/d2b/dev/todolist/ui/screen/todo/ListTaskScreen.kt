@@ -1,5 +1,6 @@
 package com.d2b.dev.todolist.ui.screen.todo
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -10,12 +11,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.d2b.dev.todolist.R
 import com.d2b.dev.todolist.data.model.Task
 import com.d2b.dev.todolist.utils.formatDate
+import com.d2b.dev.todolist.utils.isOutDate
 import com.d2b.dev.todolist.utils.showToast
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 @Composable
 fun ListTaskScreenView(
@@ -36,11 +41,8 @@ fun ListTaskScreenView(
             when (event) {
                 is TaskEvent.ToggleStatusTask -> {
                     viewModel.toggleStatusTask(event.id, event.isComplete) {
-                        context.showToast("Task is update to ${if (event.isComplete) "Complete" else "Incomplete"}")
+                        context.showToast("Task is move to ${if (event.isComplete) "complete" else "incomplete"}")
                     }
-                }
-                is TaskEvent.DeleteTask -> {
-
                 }
             }
         }
@@ -64,21 +66,21 @@ fun ListTaskScreenContent(
         }
     ) {
         val days = displayTasks
-            .map { it.dueDate.formatDate() }
-            .distinct()
-        LazyColumn(modifier = Modifier.padding(12.dp)) {
-            days.forEach { date ->
-                item() {
-                    Text(
-                        date,
-                        style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                }
-                displayTasks.filter { it.dueDate.formatDate() == date }.forEach {
-                    item(key = it.id) {
-                        TaskItemView(task = it) { isComplete ->
-                            handleEvent(TaskEvent.ToggleStatusTask(it.id, isComplete))
+            .map { it.dueDate }
+            .distinctBy { it.formatDate() }
+        if (displayTasks.isEmpty()) {
+            EmptyTasks()
+        } else {
+            LazyColumn(modifier = Modifier.padding(12.dp)) {
+                days.forEach { date ->
+                    item() {
+                        TaskItemTitle(date)
+                    }
+                    displayTasks.filter { it.dueDate.formatDate() == date.formatDate() }.forEach {
+                        item(key = it.id) {
+                            TaskItemView(task = it) { isComplete ->
+                                handleEvent(TaskEvent.ToggleStatusTask(it.id, isComplete))
+                            }
                         }
                     }
                 }
@@ -88,7 +90,27 @@ fun ListTaskScreenContent(
 }
 
 @Composable
+fun EmptyTasks() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(
+                id = R.drawable.searching
+            ),
+            contentDescription = null,
+            modifier = Modifier.size(100.dp),
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Text("Nothing to do")
+    }
+}
+
+@Composable
 fun TaskItemView(task: Task, onToggleTask: (Boolean) -> Unit) {
+    val now = Clock.System.now()
     Card(
         modifier = Modifier
             .padding(bottom = 6.dp)
@@ -99,16 +121,36 @@ fun TaskItemView(task: Task, onToggleTask: (Boolean) -> Unit) {
             modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Checkbox(checked = task.status == Task.TaskStatus.Complete, onCheckedChange = {
-                onToggleTask(it)
-            })
+            Checkbox(
+                checked = task.status == Task.TaskStatus.Complete,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colors.primary
+                ),
+                onCheckedChange = {
+                    onToggleTask(it)
+                }
+            )
             Spacer(modifier = Modifier.width(12.dp))
             Column() {
                 Text(task.name, style = MaterialTheme.typography.body1)
                 Text(task.note, style = MaterialTheme.typography.caption)
             }
+            if (task.dueDate.isOutDate()) {
+                Spacer(modifier = Modifier.weight(1F))
+                Text("Out date", color = Color.Red)
+            }
         }
     }
+}
+
+@Composable
+fun TaskItemTitle(date: Instant) {
+    Text(
+        date.formatDate(),
+        style = MaterialTheme.typography.h6,
+        modifier = Modifier.padding(bottom = 12.dp),
+        color = if (date.isOutDate()) Color.Red else Color.Black
+    )
 }
 
 @Preview
