@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.d2b.dev.todolist.data.model.Task
 import com.d2b.dev.todolist.service.TaskManager
 import com.d2b.dev.todolist.ui.BaseViewModel
+import com.d2b.dev.todolist.utils.isOutDate
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.lang.Exception
@@ -17,7 +18,7 @@ class AddTaskViewModel : BaseViewModel() {
             val errorMessage = when {
                 name.isBlank() -> "Name can't empty"
                 note.isBlank() -> "Note can't empty"
-                due < now -> "Due can't be in pass"
+                due.isOutDate() -> "Due can't be in pass"
                 else -> null
             }
             errorMessage?.let {

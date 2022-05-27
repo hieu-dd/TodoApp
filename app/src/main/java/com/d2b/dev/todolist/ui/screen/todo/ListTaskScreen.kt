@@ -9,10 +9,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.d2b.dev.todolist.data.model.Task
-import com.d2b.dev.todolist.utils.DateTime
+import com.d2b.dev.todolist.utils.formatDate
+import com.d2b.dev.todolist.utils.showToast
 import kotlinx.datetime.Clock
 
 @Composable
@@ -20,6 +22,8 @@ fun ListTaskScreenView(
     typeScreen: TypeScreen = TypeScreen.All,
     viewModel: ListTaskViewModel = ListTaskViewModel(),
 ) {
+    val context = LocalContext.current
+
     val tasks by viewModel.getTasksFlow().collectAsState()
     val displayTasks = tasks.filter {
         typeScreen == TypeScreen.All ||
@@ -31,7 +35,9 @@ fun ListTaskScreenView(
         handleEvent = { event ->
             when (event) {
                 is TaskEvent.ToggleStatusTask -> {
-                    viewModel.toggleStatusTask(event.id, event.isComplete)
+                    viewModel.toggleStatusTask(event.id, event.isComplete) {
+                        context.showToast("Task is update to ${if (event.isComplete) "Complete" else "Incomplete"}")
+                    }
                 }
                 is TaskEvent.DeleteTask -> {
 
@@ -58,7 +64,7 @@ fun ListTaskScreenContent(
         }
     ) {
         val days = displayTasks
-            .map { DateTime.formatDate(it.dueDate) }
+            .map { it.dueDate.formatDate() }
             .distinct()
         LazyColumn(modifier = Modifier.padding(12.dp)) {
             days.forEach { date ->
@@ -69,7 +75,7 @@ fun ListTaskScreenContent(
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
                 }
-                displayTasks.filter { DateTime.formatDate(it.dueDate) == date }.forEach {
+                displayTasks.filter { it.dueDate.formatDate() == date }.forEach {
                     item(key = it.id) {
                         TaskItemView(task = it) { isComplete ->
                             handleEvent(TaskEvent.ToggleStatusTask(it.id, isComplete))

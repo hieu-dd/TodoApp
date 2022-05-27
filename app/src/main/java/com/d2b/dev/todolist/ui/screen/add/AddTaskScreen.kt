@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.d2b.dev.todolist.utils.DateTime
+import com.d2b.dev.todolist.utils.formatDate
 import com.d2b.dev.todolist.utils.showDatePicker
 import com.d2b.dev.todolist.utils.showToast
 import kotlinx.coroutines.flow.collect
@@ -151,7 +151,7 @@ fun AddTaskContent(
             Text("Due date", style = MaterialTheme.typography.h6)
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = DateTime.formatDate(dueDate),
+                value = dueDate.formatDate(),
                 readOnly = true,
                 onValueChange = {},
                 placeholder = {

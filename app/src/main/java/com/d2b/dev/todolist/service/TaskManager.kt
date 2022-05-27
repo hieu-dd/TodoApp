@@ -29,11 +29,10 @@ class TaskManager : CoroutineScope {
         })
     }
 
-    suspend fun updateTask(taskId: String) {
+    suspend fun updateStatusTask(taskId: String, isComplete: Boolean) {
         val newTasks = copyAndUpdateTasks(_tasks.value, taskId) {
             it.apply {
-                status =
-                    if (it.status == Task.TaskStatus.Complete) Task.TaskStatus.Incomplete else Task.TaskStatus.Complete
+                status = if (isComplete) Task.TaskStatus.Complete else Task.TaskStatus.Incomplete
             }
         }
         _tasks.emit(newTasks.toMutableList())
