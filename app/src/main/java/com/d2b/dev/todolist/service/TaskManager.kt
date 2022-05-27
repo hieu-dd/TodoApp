@@ -1,5 +1,6 @@
 package com.d2b.dev.todolist.service
 
+import androidx.annotation.VisibleForTesting
 import com.d2b.dev.todolist.data.model.Task
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +39,11 @@ class TaskManager : CoroutineScope {
         _tasks.emit(newTasks.toMutableList())
     }
 
-    private fun copyAndUpdateTasks(tasks: List<Task>, taskId: String, block: (Task) -> Task): List<Task> {
+    private fun copyAndUpdateTasks(
+        tasks: List<Task>,
+        taskId: String,
+        block: (Task) -> Task
+    ): List<Task> {
         val result = tasks.map {
             if (it.id == taskId) {
                 block(it.copy())
@@ -47,5 +52,9 @@ class TaskManager : CoroutineScope {
             }
         }
         return result
+    }
+
+    suspend fun clearTasks() {
+        _tasks.emit(mutableListOf())
     }
 }

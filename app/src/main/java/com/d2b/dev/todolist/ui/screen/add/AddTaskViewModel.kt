@@ -2,7 +2,7 @@ package com.d2b.dev.todolist.ui.screen.add
 
 import com.d2b.dev.todolist.data.model.Task
 import com.d2b.dev.todolist.service.TaskManager
-import com.d2b.dev.todolist.ui.BaseViewModel
+import com.d2b.dev.todolist.ui.base.BaseViewModel
 import com.d2b.dev.todolist.utils.isOutDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.datetime.Clock
@@ -15,7 +15,12 @@ class AddTaskViewModel @Inject constructor(
     private val taskManager: TaskManager,
 ) : BaseViewModel() {
 
-    fun addTask(name: String, note: String, due: Instant, onSuccess: () -> Unit) {
+    fun addTask(
+        name: String,
+        note: String,
+        due: Instant,
+        onSuccess: () -> Unit
+    ) {
         safelyLaunch {
             val now = Clock.System.now()
             val errorMessage = when {

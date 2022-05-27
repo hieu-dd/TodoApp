@@ -1,4 +1,4 @@
-package com.d2b.dev.todolist.ui
+package com.d2b.dev.todolist.ui.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel() {
-
-
     protected open val viewModelCoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         viewModelScope.launch {
             sendError(Exception(throwable.message))
@@ -27,12 +25,6 @@ abstract class BaseViewModel : ViewModel() {
     open fun sendError(e: Exception) {
         safelyLaunch {
             _error.emit(e)
-        }
-    }
-
-    open fun clearError() {
-        safelyLaunch {
-            _error.emit(null)
         }
     }
 }
